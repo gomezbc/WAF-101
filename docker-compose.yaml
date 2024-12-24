@@ -1,4 +1,4 @@
-version: '3.5'
+version: "3.5"
 
 services:
   bunkerweb:
@@ -9,14 +9,15 @@ services:
     labels:
       - "bunkerweb.INSTANCE=yes"
     environment:
-      - SERVER_NAME=www.juice_shop.com
+      - SERVER_NAME=www.juiceshop.com
       - MULTISITE=yes
+      - UI_HOST=ui.bunker-waf.com
       - API_WHITELIST_IP=127.0.0.0/8 10.20.30.0/24
-      - www.juice_shop.com_USE_UI=yes
-      - www.juice_shop.com_USE_REVERSE_PROXY=yes
-      - www.juice_shop.com_REVERSE_PROXY_URL=/changeme
-      - www.juice_shop.com_REVERSE_PROXY_HOST=http://bw-ui:7000
-      - www.juice_shop.com_INTERCEPTED_ERROR_CODES=400 404 405 413 429 500 501 502 503 504
+      - www.juiceshop.com_USE_UI=yes
+      - www.juiceshop.com_USE_REVERSE_PROXY=yes
+      - www.juiceshop.com_REVERSE_PROXY_URL=/changeme
+      - www.juiceshop.com_REVERSE_PROXY_HOST=http://bw-ui:7000
+      - www.juiceshop.com_INTERCEPTED_ERROR_CODES=400 404 405 413 429 500 501 502 503 504
     networks:
       - bw-universe
       - bw-services
@@ -53,10 +54,15 @@ services:
     environment:
       - DOCKER_HOST=tcp://bw-docker:2375
       - ADMIN_USERNAME=admin
-      - ADMIN_PASSWORD=changeme
+      - ADMIN_PASSWORD=Adm1nP4ssw0rd
     networks:
       - bw-universe
       - bw-docker
+
+  juice-shop:
+    image: bkimminich/juice-shop
+    networks:
+      - bw-services
 
 volumes:
   bw-data:

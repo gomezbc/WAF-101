@@ -28,6 +28,7 @@ services:
       www.juiceshop.com_REVERSE_PROXY_URL: /
       www.juiceshop.com_REVERSE_PROXY_HOST: http://juice-shop:3000
       www.juiceshop.com_ALLOWED_METHODS: "GET|POST|PUT|DELETE"
+      www.juiceshop.com_USE_BAD_BEHAVIOR: no
       bunkerweb.juiceshop.com_USE_UI: yes
       bunkerweb.juiceshop.com_USE_REVERSE_PROXY: yes
       bunkerweb.juiceshop.com_REVERSE_PROXY_URL: /
@@ -35,6 +36,7 @@ services:
       bunkerweb.juiceshop.com_GENERATE_SELF_SIGNED_SSL: "yes"
       bunkerweb.juiceshop.com_MAX_CLIENT_SIZE: "50m"
       bunkerweb.juiceshop.com_ALLOWED_METHODS: "GET|POST|PUT|DELETE"
+      bunkerweb.juiceshop.com_USE_BAD_BEHAVIOR: no
     restart: "unless-stopped"
     networks:
       - bw-universe
@@ -47,8 +49,6 @@ services:
       - DOCKER_HOST=tcp://bw-docker:2375
       - ADMIN_USERNAME=admin
       - ADMIN_PASSWORD=Adm1nP4ssw0rd!
-    ports:
-      - 7000:7000
     restart: "unless-stopped"
     networks:
       - bw-universe

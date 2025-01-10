@@ -77,6 +77,72 @@
       extra_hosts:
         - "www.juiceshop.com:10.10.10.200"
 
+    redis:
+      image: redis:7-alpine
+      container_name: redis
+      ports:
+        - "6379:6379"
+      environment:
+        - REDIS_PASSWORD=gQr8qHroGX7gqj6Gf+AsFSaHhbjN2AJCKak3k34HX4l0/kR5
+      networks:
+        - monitoring
+      command: redis-server --requirepass gQr8qHroGX7gqj6Gf+AsFSaHhbjN2AJCKak3k34HX4l0/kR5 --bind 0.0.0.0
+
+    filebeat:
+      build:
+        context: monitoring
+        dockerfile: Logstash.Dockerfile
+      container_name: filebeat
+      user: root
+      command: filebeat -e
+      volumes:
+        - ./nginx-log:/var/log/nginx
+      networks:
+        - monitoring
+      depends_on:
+        - redis
+
+    logstash:
+      image: docker.elastic.co/logstash/logstash:8.17.0
+      container_name: logstash
+      ports:
+        - "5044:5044"
+      volumes:
+        - ./monitoring/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+        - ./monitoring/GeoLite2-City.mmdb:/usr/share/elasticsearch/modules/ingest-geoip/GeoLite2-City.mmdb
+      networks:
+        - monitoring
+      depends_on:
+        - redis
+        - elasticsearch
+
+    elasticsearch:
+      image: docker.elastic.co/elasticsearch/elasticsearch:8.17.0
+      container_name: elasticsearch
+      environment:
+        - discovery.type=single-node
+        - xpack.security.enabled=false
+      networks:
+        - monitoring
+      ports:
+        - "9200:9200"
+        - "9300:9300"
+
+    grafana:
+      image: grafana/grafana:11.4.0
+      container_name: grafana
+      ports:
+        - "3000:3000"
+      environment:
+        - GF_SECURITY_ADMIN_PASSWORD=grafana
+      volumes:
+        - ./monitoring/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      networks:
+        - monitoring
+      depends_on:
+        - elasticsearch
+
+
   networks:
     backend:
       driver: bridge
@@ -84,3 +150,4 @@
         driver: default
         config:
           - subnet: 10.10.10.0/24
+    monitoring:

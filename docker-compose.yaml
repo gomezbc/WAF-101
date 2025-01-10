@@ -136,6 +136,7 @@
       environment:
         - GF_SECURITY_ADMIN_PASSWORD=grafana
       volumes:
+        - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards
         - ./monitoring/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
       networks:
         - monitoring

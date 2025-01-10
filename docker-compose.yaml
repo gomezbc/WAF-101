@@ -1,86 +1,86 @@
-services:
-  juice-shop:
-    image: bkimminich/juice-shop
-    container_name: juice-shop
-    environment:
-      NODE_ENV: production
-      LOG_LEVEL: debug
-    networks:
-      backend:
-        ipv4_address: 10.10.10.100
-  
-  nginx-modsec:
-    build: .
-    container_name: nginx-modsec
-    volumes:
-      - ./nginx.log:/var/log/nginx/access.log:rw
-    ports:
-      - 80:80
-    networks:
-      backend:
-        ipv4_address: 10.10.10.200
+  services:
+    juice-shop:
+      image: bkimminich/juice-shop
+      container_name: juice-shop
+      environment:
+        LOG_LEVEL: debug
+      networks:
+        backend:
+          ipv4_address: 10.10.10.100
+    
+    nginx-modsec:
+      build: .
+      container_name: nginx-modsec
+      volumes:
+        - ./nginx-log:/var/log/nginx:rw
+      ports:
+        - 80:80
+      networks:
+        backend:
+          ipv4_address: 10.10.10.200
 
-  sql-injection:
-    image: curlimages/curl:latest
-    container_name: sql-injection
-    depends_on:
-      - juice-shop
-    entrypoint: >
-      sh -c "
-        sleep 5 &&
-        while true; do
-          echo && curl -o /dev/null -s -w "%{http_code}" -X POST -d 'email=admin@juice-shop.com' -d 'password=\' OR \'1\'=\'1' http://www.juiceshop.com/rest/user/login;
-          echo && curl -o /dev/null -s -w "%{http_code}" -X POST -d 'email=test@evil.com' -d 'password=\' OR \'x\'=\'x' http://www.juiceshop.com/rest/user/login;
-          sleep 5;
-        done
-      "
-    networks:
-      - backend
-    extra_hosts:
-      - "www.juiceshop.com:10.10.10.200"
+    sql-injection:
+      image: curlimages/curl:latest
+      container_name: sql-injection
+      depends_on:
+        - juice-shop
+      entrypoint: >
+        sh -c "
+          sleep 5 &&
+          while true; do
+            echo && curl -o /dev/null -s -w \"%{http_code}\" -X POST -d email=admin@juice-shop.com -d password=\\'\\ OR\\ \\1\\=\\1 http://www.juiceshop.com/rest/user/login;
+            echo && curl -o /dev/null -s -w \"%{http_code}\" -X POST -d email=test@evil.com -d password=\\'\\ OR\\ \\x\\=\\x http://www.juiceshop.com/rest/user/login;
+            sleep 5;
+          done
+        "
+      networks:
+        - backend
+      extra_hosts:
+        - "www.juiceshop.com:10.10.10.200"
 
-  xss-attack:
-    image: curlimages/curl:latest
-    container_name: xss-attack
-    depends_on:
-      - juice-shop
-    entrypoint: >
-      sh -c "
-        sleep 5 &&
-        while true; do
-          echo && curl -o /dev/null -s -w "%{http_code}" -X POST -d 'comment=<script>alert(\"XSS\")</script>' http://www.juiceshop.com/rest/product/1/reviews;
-          echo && curl -o /dev/null -s -w "%{http_code}" -X POST -d 'comment=<img src=\"invalid-url\" onerror=\"alert(1)\">' http://www.juiceshop.com/rest/product/1/reviews;
-          sleep 5;
-        done
-      "
-    networks:
-      - backend
-    extra_hosts:
-      - "www.juiceshop.com:10.10.10.200"
 
-  legitimate-traffic:
-    image: curlimages/curl:latest
-    container_name: legitimate-traffic
-    depends_on:
-      - juice-shop
-    entrypoint: >
-      sh -c "
-        sleep 5 &&
-        while true; do
-            echo && curl -o /dev/null -s -w '%{http_code}' -X GET http://www.juiceshop.com/;     
-            echo && curl -o /dev/null -s -w '%{http_code}' -X GET http://www.juiceshop.com/assets/public/css/styles.css;
-          sleep 10;
-        done
-      "
-    networks:
-      - backend
-    extra_hosts:
-      - "www.juiceshop.com:10.10.10.200"
+    xss-attack:
+      image: curlimages/curl:latest
+      container_name: xss-attack
+      depends_on:
+        - juice-shop
+      entrypoint: >
+        sh -c "
+          sleep 5 &&
+          while true; do
+            echo && curl -o /dev/null -s -w "%{http_code}" -X POST -d 'comment=<script>alert(\"XSS\")</script>' http://www.juiceshop.com/rest/product/1/reviews;
+            echo && curl -o /dev/null -s -w "%{http_code}" -X POST -d 'comment=<img src=\"invalid-url\" onerror=\"alert(1)\">' http://www.juiceshop.com/rest/product/1/reviews;
+            sleep 5;
+          done
+        "
+      networks:
+        - backend
+      extra_hosts:
+        - "www.juiceshop.com:10.10.10.200"
 
-networks:
-  backend:
-    driver: bridge
-    ipam:
-      driver: default
-      config:
-        - subnet: 10.10.10.0/24
+    legitimate-traffic:
+      image: curlimages/curl:latest
+      container_name: legitimate-traffic
+      depends_on:
+        - juice-shop
+      entrypoint: >
+        sh -c "
+          sleep 5 &&
+          while true; do
+              echo && curl -o /dev/null -s -w '%{http_code}' -X GET http://www.juiceshop.com/;     
+              echo && curl -o /dev/null -s -w '%{http_code}' -X GET http://www.juiceshop.com/assets/public/css/styles.css;
+            sleep 10;
+          done
+        "
+      networks:
+        - backend
+      extra_hosts:
+        - "www.juiceshop.com:10.10.10.200"
+
+  networks:
+    backend:
+      driver: bridge
+      ipam:
+        driver: default
+        config:
+          - subnet: 10.10.10.0/24

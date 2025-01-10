@@ -16,32 +16,6 @@ Hemos optado por **BunkerWeb** porque es un WAF ligero y fácil de configurar, i
 
 Aunque los **Cloud Service Providers (CSP)** como AWS, Azure o GCP ofrecen soluciones WAF, para este laboratorio consideramos más práctico implementar BunkerWeb en local utilizando Docker. Esto permite mayor control y evita depender de servicios externos.
 
-## Configurar el archivo `/etc/hosts`  
-Para acceder a los dominios configurados en el laboratorio (`www.juiceshop.com` y `bunkerweb.juiceshop.com`), es necesario añadirlos al archivo `hosts` de tu sistema. Sigue las instrucciones según tu sistema operativo:
-
-### **Windows**  
-1. Abre un editor de texto como administrador (por ejemplo, Notepad).  
-2. Ve a `C:\Windows\System32\drivers\etc\hosts`.  
-3. Añade las siguientes líneas al final del archivo:  
-   ```
-   127.0.0.1 www.juiceshop.com
-   127.0.0.1 bunkerweb.juiceshop.com
-   ```
-4. Guarda el archivo.
-
-### **Linux/Mac**  
-1. Abre una terminal.  
-2. Edita el archivo `/etc/hosts` con un editor de texto (requiere permisos de administrador). Por ejemplo:  
-   ```bash
-   sudo nano /etc/hosts
-   ```
-3. Añade las siguientes líneas al final del archivo:  
-   ```
-   127.0.0.1 www.juiceshop.com
-   127.0.0.1 bunkerweb.juiceshop.com
-   ```
-4. Guarda y cierra el archivo.
-
 ## Lanzar el Docker Compose  
 1. Guarda el archivo `docker-compose.yml` proporcionado en tu sistema.  
 2. Abre una terminal y navega al directorio donde guardaste el archivo.  
@@ -58,8 +32,33 @@ Para acceder a los dominios configurados en el laboratorio (`www.juiceshop.com` 
 
 ## Acceder a las URLs  
 Una vez que los servicios estén en ejecución:  
-- **Interfaz de BunkerWeb**: Abre un navegador y accede a `http://bunkerweb.juiceshop.com`.  
-  - Credenciales:  
-    - Usuario: `admin`  
-    - Contraseña: `Adm1nP4ssw0rd!`  
-- **Juice Shop protegido**: Accede a `http://www.juiceshop.com`.  
+- **Juice Shop protegido**: Accede a `http://localhost`.
+- **Juice Shop desprotegido**: Accede a `http://10.10.10.100:3000`.
+
+## Probar SQLi
+
+
+
+## Analizar los logs
+
+```sh
+grep '"transaction"' nginx.log | jq 'select(.transaction.request.uri == "/rest/user/login") | {client_ip: .transaction.client_ip, uri: .transaction.request.uri, http_code: .transaction.response.http_code, messages: [.transaction.messages[] | {ruleId: .details.ruleId, message: .message}]}'
+```
+
+```json
+{
+  "client_ip": "10.10.10.1",
+  "uri": "/rest/user/login",
+  "http_code": 403,
+  "messages": [
+    {
+      "ruleId": "942100",
+      "message": "SQL Injection Attack Detected via libinjection"
+    },
+    {
+      "ruleId": "949110",
+      "message": "Inbound Anomaly Score Exceeded (Total Score: 5)"
+    }
+  ]
+}
+```

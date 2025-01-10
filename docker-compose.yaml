@@ -1,5 +1,3 @@
-version: "3.5"
-
 services:
   bunkerweb:
     image: bunkerity/bunkerweb:1.6.0-beta
@@ -55,9 +53,64 @@ services:
 
   juice-shop:
     image: bkimminich/juice-shop
+    container_name: juice-shop
+    environment:
+      NODE_ENV: production
+      LOG_LEVEL: debug
     networks:
       - bw-services
 
+  sql-injection:
+    image: curlimages/curl:latest
+    container_name: sql-injection
+    depends_on:
+      - juice-shop
+    entrypoint: >
+      sh -c "
+        sleep 5 &&
+        while true; do
+          curl -X POST -d 'email=admin@juice-shop.com' -d 'password=\' OR \'1\'=\'1' http://www.juiceshop.com/rest/user/login;
+          curl -X POST -d 'email=test@evil.com' -d 'password=\' OR \'x\'=\'x' http://www.juiceshop.com/rest/user/login;
+          sleep 5;
+        done
+      "
+    networks:
+      - bw-services
+
+  xss-attack:
+    image: curlimages/curl:latest
+    container_name: xss-attack
+    depends_on:
+      - juice-shop
+    entrypoint: >
+      sh -c "
+        sleep 5 &&
+        while true; do
+          curl -X POST -d 'comment=<script>alert(\"XSS\")</script>' http://www.juiceshop.com/rest/product/1/reviews;
+          curl -X POST -d 'comment=<img src=\"invalid-url\" onerror=\"alert(1)\">' http://www.juiceshop.com/rest/product/1/reviews;
+          sleep 5;
+        done
+      "
+    networks:
+      - bw-services
+
+  legitimate-traffic:
+    image: curlimages/curl:latest
+    container_name: legitimate-traffic
+    depends_on:
+      - juice-shop
+    entrypoint: >
+      sh -c "
+        sleep 5 &&
+        while true; do
+          curl -X GET http://www.juiceshop.com;
+          curl -X GET http://www.juiceshop.com/assets/public/css/styles.css;
+          sleep 10;
+        done
+      "
+    networks:
+      - bw-services
+      
 volumes:
   bw-data:
 

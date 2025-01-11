@@ -9,7 +9,9 @@
           ipv4_address: 10.10.10.100
     
     nginx-modsec:
-      build: .
+      build:
+        context: nginx-modsec
+        dockerfile: Dockerfile
       container_name: nginx-modsec
       volumes:
         - ./nginx-log:/var/log/nginx:rw

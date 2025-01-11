@@ -1139,7 +1139,7 @@
   },
   "timepicker": {},
   "timezone": "",
-  "title": "NGINX ModSecurity OWASP2",
+  "title": "WAF Monitoring",
   "uid": "O1yNV73nk2",
   "version": 1,
   "weekStart": ""

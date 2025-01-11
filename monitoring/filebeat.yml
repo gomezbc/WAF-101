@@ -2,7 +2,7 @@ filebeat.inputs:
   - type: log
     enabled: true
     paths:
-      - /var/log/nginx/filebeat.vietcapitalbank.com.vn.access.log
+      - /var/log/nginx/filebeat.juiceshop.com.access.log
       - /var/log/nginx/modsec_audit.log
 
     json.keys_under_root: true

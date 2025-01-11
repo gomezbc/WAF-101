@@ -8,4 +8,4 @@ datasources:
     isDefault: true
     jsonData:
       timeField: "@timestamp"
-    index: "logstash-nginx-*"
+    index: "logstash-*"

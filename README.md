@@ -62,3 +62,6 @@ grep '"transaction"' nginx.log | jq 'select(.transaction.request.uri == "/rest/u
   ]
 }
 ```
+
+PARA QUE FUNCIONE HAY QUE PONER: 
+chmod go-w monitoring/filebeat.yml  

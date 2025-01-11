@@ -134,6 +134,7 @@
       ports:
         - "3000:3000"
       environment:
+        - GF_SECURITY_ADMIN_USER=admin
         - GF_SECURITY_ADMIN_PASSWORD=grafana
       volumes:
         - ./monitoring/dashboards:/etc/grafana/provisioning/dashboards
@@ -142,6 +143,7 @@
         - monitoring
       depends_on:
         - elasticsearch
+      entrypoint: ["/bin/bash", "-c", "until curl -s http://elasticsearch:9200; do echo 'Esperando a Elasticsearch...'; sleep 5; done; exec /run.sh"]
 
 
   networks:

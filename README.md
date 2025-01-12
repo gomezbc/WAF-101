@@ -17,11 +17,6 @@
     - [Ejercicio 1: Configuración de ModSecurity en modo de detección](#ejercicio-1-configuración-de-modsecurity-en-modo-de-detección)
     - [Ejercicio 2: Activación del WAF](#ejercicio-2-activación-del-waf)
     - [Ejercicio 3: Encuentra el Flag](#ejercicio-3-encuentra-el-flag)
-  - [Guía de uso](#guía-de-uso)
-    - [Despliegue de los servicios](#despliegue-de-los-servicios)
-    - [Simular una oleada de ataques](#simular-una-oleada-de-ataques)
-  - [Acceder a las URLs](#acceder-a-las-urls)
-    - [Analizar los logs](#analizar-los-logs)
   - [Referencias](#referencias)
 
 ## ¿Qué es un WAF?  
@@ -133,6 +128,9 @@ En esta primera parte del laboratorio, configuraremos ModSecurity en modo de det
 docker compose up nginx-modsec juice-shop grafana logstash filebeat redis elasticsearch -d --build
 ```
 Esto lanzará los servicios de Juice Shop, Nginx con ModSecurity, Grafana, Logstash, Filebeat, Redis y Elasticsearch.
+
+>[!warning]
+> Deberás esperar unos minutos para que los servicios se inicien y estén completamente operativos.
 
 **Realizar un ataque de SQL Injection**
 1. Accede a la página de login de Juiceshop: [http://localhost/#/login](http://localhost/#/login)

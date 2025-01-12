@@ -63,7 +63,19 @@ Una vez que los servicios estén en ejecución:
 
 ## Analizar los logs
 Para visualizar los datos recolectados puede verlos de forma gráfica en Grafana.(`http://localhost:3000`)
+Los paneles creados por defecto son los siguientes:
 ![DashboardImage](dashboard.png)
+
+Para configurar un panel en Grafana:
+1. Selecciona "Create Panel" y usa Elasticsearch como fuente de datos.
+2. Configura una consulta que agrupe por algún campo relevante (por ejemplo, tipo de ataque).
+3. Personaliza los colores y agrega etiquetas para facilitar la lectura.
+
+
+También puedes añadir más paneles y métricas según tus necesidades al dashboard dado:
+1. Selecciona "Edit" en el dashboard.
+2. Selecciona "Add" y elige el tipo de "Visualzation".
+3. Configura la consulta y el tipo de gráfico que deseas añadir.
 
 ## Referencias
 - [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/)

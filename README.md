@@ -33,7 +33,7 @@ Una vez que todas las reglas que inspeccionan los datos de la solicitud han sido
 ![alt text](anomaly-scoring.png)
 
 ### Niveles de Paranoia
-El nivel de paranoia (PL) permite definir cuán agresivo es el conjunto de reglas de CRS.
+El [nivel de paranoia (PL)](https://coreruleset.org/docs/concepts/paranoia_levels/) permite definir cuán agresivo es el conjunto de reglas de CRS.
 
 Un nivel de paranoia más alto hace más difícil que un atacante pase desapercibido. Sin embargo, esto tiene el costo de más falsos positivos: más falsas alarmas. Esa es la desventaja de ejecutar un conjunto de reglas que detecta casi todo: también se interrumpe el tráfico legítimo de tu negocio, servicio o aplicación web.
 

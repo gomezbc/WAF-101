@@ -55,14 +55,14 @@ ModSecurity utiliza un enfoque basado en [Anomaly Scoring](https://coreruleset.o
 
 Una vez que todas las reglas que inspeccionan los datos de la solicitud han sido ejecutadas, se realiza la evaluación de bloqueo. Si el puntaje de anomalía es mayor o igual al umbral de puntaje de anomalía de entrada, la transacción es denegada. Las transacciones que no son denegadas continúan su flujo.
 
-![alt text](anomaly-scoring.png)
+![alt text](images/anomaly-scoring.png)
 
 ### Niveles de Paranoia
 El [nivel de paranoia (PL)](https://coreruleset.org/docs/concepts/paranoia_levels/) permite definir cuán agresivo es el conjunto de reglas de CRS.
 
 Un nivel de paranoia más alto hace más difícil que un atacante pase desapercibido. Sin embargo, esto tiene el costo de más falsos positivos: más falsas alarmas. Esa es la desventaja de ejecutar un conjunto de reglas que detecta casi todo: también se interrumpe el tráfico legítimo de tu negocio, servicio o aplicación web.
 
-![alt text](pl.png)
+![alt text](images/pl.png)
 Cada nivel de paranoia sucesivo es un superconjunto del anterior.
 
 Cuando ocurren falsos positivos, deben ajustarse. En la jerga de ModSecurity: se deben escribir **exclusiones de reglas**. Una exclusión de regla es una regla que desactiva otra regla, ya sea completamente o solo parcialmente para ciertos parámetros o URIs. Esto significa que el conjunto de reglas sigue intacto, pero la instalación de CRS ya no se ve afectada por los falsos positivos.
@@ -131,7 +131,7 @@ Esto lanzará los servicios de Juice Shop, Nginx con ModSecurity, Grafana, Logst
 1. Accede a la página de login de Juiceshop: [http://localhost/#/login](http://localhost/#/login)
 2. Realiza un ataque de SQL Injection en el campo de usuario. Puedes utilizar:
    + Dirección de correo `OR 1=1 --`
-   + Contraseña cualquiera ![sqli](login_sqli.png)
+   + Contraseña cualquiera ![sqli](images/login_sqli.png)
    + 
 Si has realizado correctamente el SQLi, habras conseguido iniciar sesión correctamente como el administrador.
 
@@ -148,7 +148,7 @@ Para acceder a ellos, primero debes acceder a Grafana:
 - Haz click en el apartado de **Dashboards** y selecciona **WAF Monitoring**.
 - Desplazate hasta bajo del Dashboard y podrás ver los logs de ModSecurity en un panel llamado *Prevented Attack Logs*. Donde deberias ver un registro similar a este:
 `SQL Injection Attack Detected via libinjection`.
-![alt text](sqli_detected.png)
+![alt text](images/sqli_detected.png)
 Este registro indica que ModSecurity ha detectado un ataque de inyección SQL y ha registrado la información correspondiente pese a que no ha bloqueado la petición.
 
 ### Ejercicio 2: Activación del WAF
@@ -179,7 +179,7 @@ docker compose up nginx-modsec -d --build
    +  Accede de nuevo a Juiceshop, cierra sesión
    +  Intenta hacer el sqli de nuevo. 
    +  Deberías ver un de error indicando que la petición ha sido bloqueada:
-![sqli blocked](sqli_block.png)
+![sqli blocked](images/sqli_block.png)
 ¡Felicidades! Has configurado correctamente el WAF y has bloqueado un ataque de inyección SQL.
 ### Ejercicio 3: Encuentra el Flag
 En este ejercicio, aprenderás a analizar logs de ModSecurity para encontrar información específica.
@@ -235,7 +235,7 @@ Para visualizar los datos recolectados puede verlos de forma gráfica en Grafana
 + Número de solicitudes.
 + (`http://localhost:3000`)
 Los paneles creados por defecto son los siguientes:
-![DashboardImage](dashboard.png)
+![DashboardImage](images/dashboard.png)
 
 **Para configurar un panel en Grafana:**
 1. Selecciona "Create Panel" y usa Elasticsearch como fuente de datos.

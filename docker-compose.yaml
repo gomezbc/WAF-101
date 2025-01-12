@@ -51,7 +51,7 @@
       entrypoint: >
         sh -c "
           sleep 5 &&
-          curl -o /dev/null -s -w '%{http_code}' -X POST -d 'comment=<img src=\"invalid-url\" onerror=\"alert(1)\">' 'http://www.juiceshop.com/rest/product/1/reviews?flag=flag{w4f_detection_enabled}';
+          curl -o /dev/null -s -w '%{http_code}' -X POST -d 'comment=<img src=\"invalid-url\" onerror=\"alert(1)\">' 'http://www.juiceshop.com/rest/product/1/reviews?flag=flag%7Bw4f_detection_enabled%7D';
         "
       extra_hosts:
         - "www.juiceshop.com:10.10.10.200"

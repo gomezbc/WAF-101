@@ -215,7 +215,7 @@ Tu misión:
 1. Accede a Grafana, el centro de control, en (http://localhost:3000)[http://localhost:3000].
 2. Dirígete al Dashboard "WAF Monitoring" para visualizar los logs del sistema.
 3. Usa la columna `request_uri` para filtrar solicitudes que te parezcan fuera de lo común. Analiza cuidadosamente las entradas relacionadas con la IP sospechosa.
-4. Busca en los registros el patrón flag{}, la firma que delata la presencia del flag.
+4. Busca en los registros el patrón flag{}, la firma que delata la presencia del flag. Ten en cuenta que los caracteres {} pueden estar codificados en la URL como %7B y %7D, por lo que también deberías buscar esas versiones codificadas.
 
 El destino del sistema depende de tu capacidad para analizar los logs y descubrir el flag. ¡Buena suerte, investigador cibernético!
 

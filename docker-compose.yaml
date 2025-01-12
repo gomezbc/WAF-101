@@ -51,7 +51,7 @@
       entrypoint: >
         sh -c "
           sleep 5 &&
-          curl -o /dev/null -s -w '%{http_code}' -X POST -d 'flag{w4f_detection_enabled}' http://www.juiceshop.com/rest/product/1/reviews;
+          curl -o /dev/null -s -w '%{http_code}' -X POST -d 'comment=<img src=\"invalid-url\" onerror=\"alert(1)\">' 'http://www.juiceshop.com/rest/product/1/reviews?flag=flag{w4f_detection_enabled}';
         "
       extra_hosts:
         - "www.juiceshop.com:10.10.10.200"
@@ -125,7 +125,6 @@
       container_name: logstash
       volumes:
         - ./monitoring/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-        - ./monitoring/MOCK_DATA.csv:/data/MOCK_DATA.csv
       networks:
         - monitoring
       depends_on:

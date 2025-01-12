@@ -199,13 +199,25 @@ docker compose up -d --build
 En este ejercicio, aprenderás a analizar logs de ModSecurity para encontrar información específica.
 
 **Objetivo: **
-Encontrar el flag oculto en uno de los ataques registrados por el WAF. Esta flag ha sido por una IP sospechosa, y ha realizado una sola petición que ha sido bloqueada por el WAF, por lo que deberías ser capaz de encontrarla en los logs. La flag esta siendo enviada como parte de un comentario en un producto.
+Te encuentras en medio de un incidente de seguridad. El WAF (Web Application Firewall) ha detectado múltiples intentos de ataque contra el sistema, bloqueando varias solicitudes sospechosas. Entre estos atacantes, hay uno particularmente astuto que ha dejado una pista crucial: un flag oculto.
+
+Este atacante realizó una única solicitud antes de ser bloqueado, y esa solicitud contiene la clave que debes encontrar. El flag está camuflado como parte de un comentario en un producto, escondido entre los datos registrados en los logs. Tu tarea es seguir el rastro y desenmascarar la evidencia.
+
+Afortunadamente, tienes las herramientas necesarias para resolver el caso. En los logs del WAF, puedes observar cada intento de ataque y filtrar información específica. La columna `request_uri` será tu aliada para identificar solicitudes sospechosas que podrían contener la pista que buscas.
 
 **Pasos a seguir:**
 1. Accede a Grafana (http://localhost:3000)
 2. Ve al Dashboard "WAF Monitoring"
 3. En el panel de logs, filtra por la IP sospechosa
 4. Busca en los logs el patrón "flag{}"
+
+Tu misión:
+1. Accede a Grafana, el centro de control, en (http://localhost:3000)[http://localhost:3000].
+2. Dirígete al Dashboard "WAF Monitoring" para visualizar los logs del sistema.
+3. Usa la columna `request_uri` para filtrar solicitudes que te parezcan fuera de lo común. Analiza cuidadosamente las entradas relacionadas con la IP sospechosa.
+4. Busca en los registros el patrón flag{}, la firma que delata la presencia del flag.
+
+El destino del sistema depende de tu capacidad para analizar los logs y descubrir el flag. ¡Buena suerte, investigador cibernético!
 
 **Solución:**
 El flag es: `flag{w4f_detection_enabled}`

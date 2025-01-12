@@ -43,7 +43,6 @@ Cada nivel de paranoia sucesivo es un superconjunto del anterior.
 Cuando ocurren falsos positivos, deben ajustarse. En la jerga de ModSecurity: se deben escribir **exclusiones de reglas**. Una exclusión de regla es una regla que desactiva otra regla, ya sea completamente o solo parcialmente para ciertos parámetros o URIs. Esto significa que el conjunto de reglas sigue intacto, pero la instalación de CRS ya no se ve afectada por los falsos positivos.
 
 ### Descripción de los Cuatro Niveles de Paranoia
-
 El proyecto CRS ve los cuatro niveles de paranoia de la siguiente manera:
 
 - **PL 1**: Seguridad básica con una mínima necesidad de ajustar los falsos positivos. Este es el CRS para todos los que ejecutan un servidor HTTP en Internet.
@@ -59,8 +58,15 @@ En este laboratorio se utiliza el nivel 1, ya que solamente se busca ver el func
 ## Descripción del laboratorio
 Este laboratorio está diseñado para aprender sobre seguridad web y la configuración de un WAF (Web Application Firewall) utilizando Nginx con ModSecurity. Simulamos un entorno de ataques y tráfico legítimo para evaluar la efectividad del WAF y su impacto en la protección de una aplicación vulnerable como Juice Shop. Además, se implementa un sistema de monitoreo con Elasticsearch, Logstash, y Grafana para analizar métricas en tiempo real.
 
-## Objetivo del laboratorio
+### Requisitos previos
+Para completar este laboratorio, necesitarás tener instalado Docker y Docker Compose en tu sistema. Puedes seguir las instrucciones oficiales para instalar Docker en tu sistema operativo:
+- [Docker Desktop para Windows](https://docs.docker.com/docker-for-windows/install/)
+- [Docker Desktop para Mac](https://docs.docker.com/docker-for-mac/install/)
+- [Docker Engine para Linux](https://docs.docker.com/engine/install/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+- [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 
+## Objetivo del laboratorio
 El objetivo de este laboratorio es proteger Juice Shop, una aplicación web desarrollada por OWASP que contiene numerosas vulnerabilidades comunes intencionales, como inyecciones, XSS y problemas de autenticación.
 
 Durante el laboratorio, se simularán ataques automatizados hacia Juice Shop. El objetivo es observar cómo un WAF detecta y bloquea estos ataques, protegiendo la aplicación. Esto permitirá explorar las capacidades de un WAF en un entorno controlado y entender cómo mitiga riesgos en aplicaciones web vulnerables.
@@ -83,9 +89,10 @@ Elastic Stack y Grafana permiten obtener una visión integral del entorno:
 
 Usamos Filebeat para recolectar logs de Nginx y ModSecurity y enviarlos a Logstash, donde se procesan y almacenan en Elasticsearch.
 
-## Parte 1: Configuración de ModSecurity en modo de detección
+## Ejericios del laboratorio
+### Ejercicio 1: Configuración de ModSecurity en modo de detección
 En esta primera parte del laboratorio, configuraremos ModSecurity en modo de detección (DetectionOnly). En este modo, el WAF identificará los ataques pero permitirá que el tráfico pase, lo que nos permitirá observar cómo se detectan las amenazas sin interrumpir las peticiones.
-### Configuración del entorno
+#### Configuración del entorno
 1. Clona el repositorio `git clone https://github.com/gomezbc/WAF-101.git`
 2. Navega al directorio `cd WAF-101`
 3. Despliega la página web y los servicios de monitorización utilizando Docker Compose:
@@ -93,27 +100,27 @@ En esta primera parte del laboratorio, configuraremos ModSecurity en modo de det
 docker compose up nginx-modsec juice-shop grafana logstash filebeat redis elasticsearch -d --build
 ```
 Esto lanzará los servicios de Juice Shop, Nginx con ModSecurity, Grafana, Logstash, Filebeat, Redis y Elasticsearch.
-### Realizar un ataque de SQL Injection
+#### Realizar un ataque de SQL Injection
 1. Accede a la página de login de Juiceshop: [http://localhost/#/login](http://localhost/#/login)
 2. Realiza un ataque de SQL Injection en el campo de usuario. Puedes utilizar:
    + Dirección de correo `OR 1=1 --`
    + Contraseña cualquiera ![sqli](login_sqli.png)
    + 
 Si has realizado correctamente el SQLi, habras conseguido iniciar sesión correctamente como el administrador.
-### Ver los logs de Modsecurity
+#### Ver los logs de Modsecurity
 Para facilitar la compresión del laboratorio, hemos desarrollado varios graficos que muestran la actividad de Modsecurity.
 Para acceder a ellos, primero debes acceder a Grafana:
 - **Grafana**: Accede a `http://localhost:3000`
   -  usuario: `admin`
   -  contraseña: `grafana`.
-#### Visualizar los logs de ModSecurity
+##### Visualizar los logs de ModSecurity
 - Haz click en el apartado de **Dashboards** y selecciona **WAF Monitoring**.
 - Desplazate hasta bajo del Dashboard y podrás ver los logs de ModSecurity en un panel llamado *Prevented Attack Logs*. Donde deberias ver un registro similar a este:
 `SQL Injection Attack Detected via libinjection`.
 ![alt text](sqli_detected.png)
 Este registro indica que ModSecurity ha detectado un ataque de inyección SQL y ha registrado la información correspondiente pese a que no ha bloqueado la petición.
 
-## Parte 2: Activación del WAF
+### Ejercicio 2: Activación del WAF
 En está segunda parte activaremos el WAF utilizando el bloqueo de ModSecurity para prevenir ataques e intentaremos de nuevo el SQLi
 1. Modifica el archivo [docker-compose.yaml](docker-compose.yaml). En el servicio de nginx-modsec, remplaza `MODSEC_RULE_ENGINE: DetectionOnly` por `MODSEC_RULE_ENGINE: On`. El servicio debería tener esta pinta:
 ```yaml
@@ -143,6 +150,24 @@ docker compose up nginx-modsec -d --build
    +  Deberías ver un de error indicando que la petición ha sido bloqueada:
 ![sqli blocked](sqli_block.png)
 ¡Felicidades! Has configurado correctamente el WAF y has bloqueado un ataque de inyección SQL.
+### Ejercicio 3: Encuentra el Flag
+En este ejercicio, aprenderás a analizar logs de ModSecurity para encontrar información específica.
+
+#### Objetivo
+Encontrar el flag oculto en uno de los ataques registrados por el WAF. Esta flag ha sido por una IP sospechosa, y ha realizado una sola petición.
+
+#### Pasos
+1. Accede a Grafana (http://localhost:3000)
+2. Ve al Dashboard "WAF Monitoring"
+3. En el panel de logs, filtra por la IP sospechosa
+4. Busca en los logs el patrón "flag{}"
+
+#### Pista
+- El flag está siendo enviado como parte de un comentario en un producto.
+- La IP sospechosa es la única que envía el flag
+
+#### Solución
+El flag es: `flag{w4f_detection_enabled}`
 
 ## Guía de uso
 ### Despliegue de los servicios

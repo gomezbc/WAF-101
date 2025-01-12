@@ -85,8 +85,6 @@
     redis:
       image: redis:7-alpine
       container_name: redis
-      ports:
-        - "6379:6379"
       environment:
         - REDIS_PASSWORD=gQr8qHroGX7gqj6Gf+AsFSaHhbjN2AJCKak3k34HX4l0/kR5
       networks:
@@ -110,11 +108,8 @@
     logstash:
       image: docker.elastic.co/logstash/logstash:8.17.0
       container_name: logstash
-      ports:
-        - "5044:5044"
       volumes:
         - ./monitoring/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
-        - ./monitoring/GeoLite2-City.mmdb:/usr/share/elasticsearch/modules/ingest-geoip/GeoLite2-City.mmdb
         - ./monitoring/MOCK_DATA.csv:/data/MOCK_DATA.csv
       networks:
         - monitoring
@@ -130,9 +125,6 @@
         - xpack.security.enabled=false
       networks:
         - monitoring
-      ports:
-        - "9200:9200"
-        - "9300:9300"
 
     grafana:
       image: grafana/grafana:11.4.0

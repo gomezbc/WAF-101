@@ -1,4 +1,29 @@
 # WAF-101
+## Índice
+- [WAF-101](#waf-101)
+  - [Índice](#índice)
+  - [¿Qué es un WAF?](#qué-es-un-waf)
+    - [¿Por qué hemos elegido Nginx y ModSecurity?](#por-qué-hemos-elegido-nginx-y-modsecurity)
+  - [¿Cómo detecta ataques ModSecurity?](#cómo-detecta-ataques-modsecurity)
+    - [Puntuación de Anomalías](#puntuación-de-anomalías)
+    - [Niveles de Paranoia](#niveles-de-paranoia)
+    - [Descripción de los Cuatro Niveles de Paranoia](#descripción-de-los-cuatro-niveles-de-paranoia)
+  - [Descripción del laboratorio](#descripción-del-laboratorio)
+    - [Requisitos previos](#requisitos-previos)
+  - [Objetivo del laboratorio](#objetivo-del-laboratorio)
+    - [Arquitectura del laboratorio](#arquitectura-del-laboratorio)
+    - [Métricas de monitoreo](#métricas-de-monitoreo)
+  - [Ejericios del laboratorio](#ejericios-del-laboratorio)
+    - [Ejercicio 1: Configuración de ModSecurity en modo de detección](#ejercicio-1-configuración-de-modsecurity-en-modo-de-detección)
+    - [Ejercicio 2: Activación del WAF](#ejercicio-2-activación-del-waf)
+    - [Ejercicio 3: Encuentra el Flag](#ejercicio-3-encuentra-el-flag)
+  - [Guía de uso](#guía-de-uso)
+    - [Despliegue de los servicios](#despliegue-de-los-servicios)
+    - [Simular una oleada de ataques](#simular-una-oleada-de-ataques)
+  - [Acceder a las URLs](#acceder-a-las-urls)
+    - [Analizar los logs](#analizar-los-logs)
+  - [Referencias](#referencias)
+
 ## ¿Qué es un WAF?  
 Un **Web Application Firewall (WAF)** es una herramienta de seguridad diseñada para proteger aplicaciones web al filtrar y monitorear el tráfico HTTP. Los WAFs actúan como una barrera entre los usuarios y las aplicaciones, protegiendo contra ataques como inyecciones SQL, Cross-Site Scripting (XSS) y otros exploits.  
 
@@ -92,7 +117,8 @@ Usamos Filebeat para recolectar logs de Nginx y ModSecurity y enviarlos a Logsta
 ## Ejericios del laboratorio
 ### Ejercicio 1: Configuración de ModSecurity en modo de detección
 En esta primera parte del laboratorio, configuraremos ModSecurity en modo de detección (DetectionOnly). En este modo, el WAF identificará los ataques pero permitirá que el tráfico pase, lo que nos permitirá observar cómo se detectan las amenazas sin interrumpir las peticiones.
-#### Configuración del entorno
+
+**Configuración del entorno**
 1. Clona el repositorio `git clone https://github.com/gomezbc/WAF-101.git`
 2. Navega al directorio `cd WAF-101`
 3. Despliega la página web y los servicios de monitorización utilizando Docker Compose:
@@ -100,20 +126,25 @@ En esta primera parte del laboratorio, configuraremos ModSecurity en modo de det
 docker compose up nginx-modsec juice-shop grafana logstash filebeat redis elasticsearch -d --build
 ```
 Esto lanzará los servicios de Juice Shop, Nginx con ModSecurity, Grafana, Logstash, Filebeat, Redis y Elasticsearch.
-#### Realizar un ataque de SQL Injection
+
+**Realizar un ataque de SQL Injection**
 1. Accede a la página de login de Juiceshop: [http://localhost/#/login](http://localhost/#/login)
 2. Realiza un ataque de SQL Injection en el campo de usuario. Puedes utilizar:
    + Dirección de correo `OR 1=1 --`
    + Contraseña cualquiera ![sqli](login_sqli.png)
    + 
 Si has realizado correctamente el SQLi, habras conseguido iniciar sesión correctamente como el administrador.
-#### Ver los logs de Modsecurity
+
+**Ver los logs de Modsecurity**
+
 Para facilitar la compresión del laboratorio, hemos desarrollado varios graficos que muestran la actividad de Modsecurity.
 Para acceder a ellos, primero debes acceder a Grafana:
 - **Grafana**: Accede a `http://localhost:3000`
   -  usuario: `admin`
   -  contraseña: `grafana`.
-##### Visualizar los logs de ModSecurity
+  
+
+**Visualizar los logs de ModSecurity**
 - Haz click en el apartado de **Dashboards** y selecciona **WAF Monitoring**.
 - Desplazate hasta bajo del Dashboard y podrás ver los logs de ModSecurity en un panel llamado *Prevented Attack Logs*. Donde deberias ver un registro similar a este:
 `SQL Injection Attack Detected via libinjection`.
@@ -153,20 +184,16 @@ docker compose up nginx-modsec -d --build
 ### Ejercicio 3: Encuentra el Flag
 En este ejercicio, aprenderás a analizar logs de ModSecurity para encontrar información específica.
 
-#### Objetivo
-Encontrar el flag oculto en uno de los ataques registrados por el WAF. Esta flag ha sido por una IP sospechosa, y ha realizado una sola petición.
+**Objetivo: **
+Encontrar el flag oculto en uno de los ataques registrados por el WAF. Esta flag ha sido por una IP sospechosa, y ha realizado una sola petición que ha sido bloqueada por el WAF, por lo que deberías ser capaz de encontrarla en los logs. La flag esta siendo enviada como parte de un comentario en un producto.
 
-#### Pasos
+**Pasos a seguir:**
 1. Accede a Grafana (http://localhost:3000)
 2. Ve al Dashboard "WAF Monitoring"
 3. En el panel de logs, filtra por la IP sospechosa
 4. Busca en los logs el patrón "flag{}"
 
-#### Pista
-- El flag está siendo enviado como parte de un comentario en un producto.
-- La IP sospechosa es la única que envía el flag
-
-#### Solución
+**Solución:**
 El flag es: `flag{w4f_detection_enabled}`
 
 ## Guía de uso

@@ -45,9 +45,10 @@ En este laboratorio se ha utilizado la imagen de Docker oficial con el OWASP Cor
 
 Aunque los **Cloud Service Providers (CSP)** como AWS, Azure o GCP ofrecen soluciones WAF, muchas de estas son de pago, complejas de configurar y carecen de transparencia en cuanto a su funcionamiento interno. Esto puede dificultar la comprensión y el control sobre cómo se aplican las reglas y se gestiona el tráfico. 
 
-Además, la mayoría de los WAF de terceros utilizan ModSecurity como base para implementar sus reglas y capacidades de protección. Esto se debe a que ModSecurity es una biblioteca ampliamente reconocida y flexible para la detección y mitigación de amenazas web. Por lo que en este laboratorio se ha optado por utilizar ModSecurity directamente, ya que proporciona una visión más clara y práctica de cómo funcionan los WAFs en su núcleo.
+Además, **la mayoría de los WAF de terceros utilizan ModSecurity como base para implementar sus reglas y capacidades de protección**. Esto se debe a que ModSecurity es una biblioteca ampliamente reconocida y flexible para la detección y mitigación de amenazas web. Por lo que en este laboratorio se ha optado por utilizar ModSecurity directamente, ya que proporciona una visión más clara y práctica de cómo funcionan los WAFs en su núcleo.
 
-Sin embargo, es fundamental comprender las limitaciones de ModSecurity frente a otras soluciones WAF más completas. Mientras que ModSecurity es extremadamente eficaz para detectar y mitigar ataques basados en el OWASP Top 10, como inyecciones SQL y Cross-Site Scripting (XSS), no está diseñado para abordar otros tipos de amenazas comunes en el panorama de la ciberseguridad actual, tales como protección contra ataques DDoS, gestión de bots, scraping automatizado o una interfaz gráfica nativa para administrar y visualizar datos.
+> [!important]
+> Sin embargo, es fundamental comprender las limitaciones de ModSecurity frente a otras soluciones WAF más completas. Mientras que ModSecurity es extremadamente eficaz para detectar y mitigar ataques basados en el OWASP Top 10, como inyecciones SQL y Cross-Site Scripting (XSS), no está diseñado para abordar otros tipos de amenazas comunes en el panorama de la ciberseguridad actual, tales como protección contra ataques DDoS, gestión de bots, scraping automatizado o una interfaz gráfica nativa para administrar y visualizar datos.
 
 ## ¿Cómo detecta ataques ModSecurity?
 ### Puntuación de Anomalías
@@ -55,14 +56,19 @@ ModSecurity utiliza un enfoque basado en [Anomaly Scoring](https://coreruleset.o
 
 Una vez que todas las reglas que inspeccionan los datos de la solicitud han sido ejecutadas, se realiza la evaluación de bloqueo. Si el puntaje de anomalía es mayor o igual al umbral de puntaje de anomalía de entrada, la transacción es denegada. Las transacciones que no son denegadas continúan su flujo.
 
-![alt text](images/anomaly-scoring.png)
+<p align="center">
+  <img src="images/anomaly-scoring.png" alt="alt text" width="500">
+</p>
 
 ### Niveles de Paranoia
 El [nivel de paranoia (PL)](https://coreruleset.org/docs/concepts/paranoia_levels/) permite definir cuán agresivo es el conjunto de reglas de CRS.
 
 Un nivel de paranoia más alto hace más difícil que un atacante pase desapercibido. Sin embargo, esto tiene el costo de más falsos positivos: más falsas alarmas. Esa es la desventaja de ejecutar un conjunto de reglas que detecta casi todo: también se interrumpe el tráfico legítimo de tu negocio, servicio o aplicación web.
 
-![alt text](images/pl.png)
+<p align="center">
+  <img src="images/pl.png" alt="alt text" width="500">
+</p>
+
 Cada nivel de paranoia sucesivo es un superconjunto del anterior.
 
 Cuando ocurren falsos positivos, deben ajustarse. En la jerga de ModSecurity: se deben escribir **exclusiones de reglas**. Una exclusión de regla es una regla que desactiva otra regla, ya sea completamente o solo parcialmente para ciertos parámetros o URIs. Esto significa que el conjunto de reglas sigue intacto, pero la instalación de CRS ya no se ve afectada por los falsos positivos.
@@ -78,7 +84,8 @@ El proyecto CRS ve los cuatro niveles de paranoia de la siguiente manera:
 
 - **PL 4**: Reglas tan fuertes (o paranoicas) que son adecuadas para proteger los "tesoros más valiosos". Deben usarse bajo el propio riesgo: hay que estar preparado para enfrentar una gran cantidad de falsos positivos.
 
-En este laboratorio se utiliza el nivel 1, ya que solamente se busca ver el funcionamiento de Modsecurity.
+>[!note]
+> En este laboratorio se utiliza el nivel 1, ya que solamente se busca ver el funcionamiento de Modsecurity.
 
 ## Descripción del laboratorio
 Este laboratorio está diseñado para aprender sobre seguridad web y la configuración de un WAF (Web Application Firewall) utilizando Nginx con ModSecurity. Simulamos un entorno de ataques y tráfico legítimo para evaluar la efectividad del WAF y su impacto en la protección de una aplicación vulnerable como Juice Shop. Además, se implementa un sistema de monitoreo con Elasticsearch, Logstash, y Grafana para analizar métricas en tiempo real.
@@ -130,9 +137,12 @@ Esto lanzará los servicios de Juice Shop, Nginx con ModSecurity, Grafana, Logst
 **Realizar un ataque de SQL Injection**
 1. Accede a la página de login de Juiceshop: [http://localhost/#/login](http://localhost/#/login)
 2. Realiza un ataque de SQL Injection en el campo de usuario. Puedes utilizar:
-   + Dirección de correo `OR 1=1 --`
-   + Contraseña cualquiera ![sqli](images/login_sqli.png)
-   + 
+   + Dirección de correo `'OR 1=1 --`
+   + Contraseña cualquiera
+<p align="center">
+  <img src="images/login_sqli.png" alt="sqli" width="500">
+</p>
+
 Si has realizado correctamente el SQLi, habras conseguido iniciar sesión correctamente como el administrador.
 
 **Ver los logs de Modsecurity**
@@ -148,7 +158,7 @@ Para acceder a ellos, primero debes acceder a Grafana:
 - Haz click en el apartado de **Dashboards** y selecciona **WAF Monitoring**.
 - Desplazate hasta bajo del Dashboard y podrás ver los logs de ModSecurity en un panel llamado *Prevented Attack Logs*. Donde deberias ver un registro similar a este:
 `SQL Injection Attack Detected via libinjection`.
-![alt text](images/sqli_detected.png)
+![Grafana dashboard SQLi detected]
 Este registro indica que ModSecurity ha detectado un ataque de inyección SQL y ha registrado la información correspondiente pese a que no ha bloqueado la petición.
 
 ### Ejercicio 2: Activación del WAF
@@ -173,14 +183,20 @@ nginx-modsec:
 ```
 2. Reconstruye el servicio de Nginx con ModSecurity:
 ```sh
-docker compose up nginx-modsec -d --build
+docker compose up -d --build
 ```
+>[!note]
+> Con este comando también habilitaremos los ataques automatizados, lo que nos permitirá evaluar cómo el WAF protege nuestro entorno frente a estas amenazas.
 3. Prueba el WAF:
    +  Accede de nuevo a Juiceshop, cierra sesión
-   +  Intenta hacer el sqli de nuevo. 
+   +  Intenta hacer el SQLi de nuevo. 
    +  Deberías ver un de error indicando que la petición ha sido bloqueada:
-![sqli blocked](images/sqli_block.png)
-¡Felicidades! Has configurado correctamente el WAF y has bloqueado un ataque de inyección SQL.
+<p align="center">
+  <img src="images/sqli_block.png" alt="sqli blocked" width="500">
+</p>
+
+>[!important]
+>¡Felicidades! Has configurado correctamente el WAF y has bloqueado un ataque de inyección SQL.
 ### Ejercicio 3: Encuentra el Flag
 En este ejercicio, aprenderás a analizar logs de ModSecurity para encontrar información específica.
 

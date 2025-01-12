@@ -1154,7 +1154,20 @@
             ]
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "response_code"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 0
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 16,
@@ -1173,7 +1186,8 @@
           ],
           "show": false
         },
-        "showHeader": true
+        "showHeader": true,
+        "sortBy": []
       },
       "pluginVersion": "11.4.0",
       "targets": [
@@ -1199,12 +1213,40 @@
           "timeField": "@timestamp"
         }
       ],
-      "title": "Logs",
+      "title": "Prevented Attacks Logs",
       "transformations": [
+        {
+          "id": "extractFields",
+          "options": {
+            "format": "json",
+            "jsonPaths": [
+              {
+                "alias": "ruleId",
+                "path": "[0].details.ruleId"
+              },
+              {
+                "alias": "data",
+                "path": "[0].details.data"
+              },
+              {
+                "alias": "message",
+                "path": "[0].message"
+              }
+            ],
+            "keepTime": false,
+            "replace": false,
+            "source": "transaction.messages"
+          }
+        },
         {
           "id": "organize",
           "options": {
             "excludeByName": {
+              "0": true,
+              "1": true,
+              "2": true,
+              "3": true,
+              "_id": true,
               "_index": true,
               "_source": true,
               "_type": true,
@@ -1220,7 +1262,7 @@
               "id": true,
               "log.file.path": true,
               "log.offset": true,
-              "message": true,
+              "message": false,
               "protocol": true,
               "referer": true,
               "request_body": true,
@@ -1233,6 +1275,7 @@
               "status": true,
               "tags": true,
               "transaction.client_port": true,
+              "transaction.host_ip": true,
               "transaction.host_port": true,
               "transaction.messages": true,
               "transaction.producer.components": true,
@@ -1253,7 +1296,49 @@
               "transaction.unique_id": true
             },
             "includeByName": {},
-            "indexByName": {},
+            "indexByName": {
+              "@timestamp": 0,
+              "_id": 1,
+              "_index": 2,
+              "_source": 3,
+              "_type": 4,
+              "data": 24,
+              "event.original": 5,
+              "highlight": 6,
+              "id": 7,
+              "log.file.path": 8,
+              "log.offset": 9,
+              "message": 23,
+              "ruleId": 22,
+              "sort": 10,
+              "transaction.client_ip": 11,
+              "transaction.client_port": 12,
+              "transaction.host_ip": 16,
+              "transaction.host_port": 17,
+              "transaction.messages": 19,
+              "transaction.producer.components": 20,
+              "transaction.producer.connector": 21,
+              "transaction.producer.modsecurity": 25,
+              "transaction.producer.secrules_engine": 26,
+              "transaction.request.headers.Accept": 27,
+              "transaction.request.headers.Content-Length": 28,
+              "transaction.request.headers.Content-Type": 29,
+              "transaction.request.headers.Host": 14,
+              "transaction.request.headers.User-Agent": 30,
+              "transaction.request.http_version": 31,
+              "transaction.request.method": 15,
+              "transaction.request.uri": 13,
+              "transaction.response.body": 32,
+              "transaction.response.headers.Connection": 33,
+              "transaction.response.headers.Content-Length": 34,
+              "transaction.response.headers.Content-Type": 35,
+              "transaction.response.headers.Date": 36,
+              "transaction.response.headers.Server": 37,
+              "transaction.response.http_code": 18,
+              "transaction.server_id": 38,
+              "transaction.time_stamp": 39,
+              "transaction.unique_id": 40
+            },
             "renameByName": {
               "transaction.client_ip": "client_ip",
               "transaction.client_port": "",
@@ -1278,7 +1363,17 @@
   "schemaVersion": 40,
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "datasource": {
+          "type": "elasticsearch",
+          "uid": "P31C819B24CF3C3C7"
+        },
+        "filters": [],
+        "name": "Filters",
+        "type": "adhoc"
+      }
+    ]
   },
   "time": {
     "from": "now/d",
@@ -1288,6 +1383,6 @@
   "timezone": "",
   "title": "WAF Monitoring",
   "uid": "O1yNV73nk2",
-  "version": 2,
+  "version": 1,
   "weekStart": ""
 }

@@ -1124,6 +1124,153 @@
       ],
       "title": "OWASP TOP 10 Rules ",
       "type": "piechart"
+    },
+    {
+      "datasource": {
+        "type": "elasticsearch",
+        "uid": "P31C819B24CF3C3C7"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "filterable": true,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 16,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 24,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "11.4.0",
+      "targets": [
+        {
+          "alias": "",
+          "bucketAggs": [],
+          "datasource": {
+            "type": "elasticsearch",
+            "uid": "P31C819B24CF3C3C7"
+          },
+          "hide": false,
+          "metrics": [
+            {
+              "id": "1",
+              "settings": {
+                "limit": "500"
+              },
+              "type": "logs"
+            }
+          ],
+          "query": "transaction.messages:*",
+          "refId": "A",
+          "timeField": "@timestamp"
+        }
+      ],
+      "title": "Logs",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "_index": true,
+              "_source": true,
+              "_type": true,
+              "args": true,
+              "client_ip": true,
+              "domain": true,
+              "error.message": true,
+              "error.type": true,
+              "event.original": true,
+              "file_dir": true,
+              "highlight": true,
+              "http_user_agent": true,
+              "id": true,
+              "log.file.path": true,
+              "log.offset": true,
+              "message": true,
+              "protocol": true,
+              "referer": true,
+              "request_body": true,
+              "request_length": true,
+              "request_method": true,
+              "responsetime": true,
+              "server_ip": true,
+              "size": true,
+              "sort": true,
+              "status": true,
+              "tags": true,
+              "transaction.client_port": true,
+              "transaction.host_port": true,
+              "transaction.messages": true,
+              "transaction.producer.components": true,
+              "transaction.producer.connector": true,
+              "transaction.request.headers.Accept": true,
+              "transaction.request.headers.Content-Length": true,
+              "transaction.request.headers.Content-Type": true,
+              "transaction.request.headers.User-Agent": true,
+              "transaction.request.http_version": true,
+              "transaction.response.body": true,
+              "transaction.response.headers.Connection": true,
+              "transaction.response.headers.Content-Length": true,
+              "transaction.response.headers.Content-Type": true,
+              "transaction.response.headers.Date": true,
+              "transaction.response.headers.Server": true,
+              "transaction.server_id": true,
+              "transaction.time_stamp": true,
+              "transaction.unique_id": true
+            },
+            "includeByName": {},
+            "indexByName": {},
+            "renameByName": {
+              "transaction.client_ip": "client_ip",
+              "transaction.client_port": "",
+              "transaction.host_ip": "host_ip",
+              "transaction.producer.connector": "",
+              "transaction.producer.modsecurity": "modsecurity",
+              "transaction.producer.secrules_engine": "secrules_engine",
+              "transaction.request.headers.Content-Type": "",
+              "transaction.request.headers.Host": "domain",
+              "transaction.request.method": "request_method",
+              "transaction.request.uri": "request_uri",
+              "transaction.response.http_code": "response_code"
+            }
+          }
+        }
+      ],
+      "type": "table"
     }
   ],
   "preload": false,
@@ -1141,6 +1288,6 @@
   "timezone": "",
   "title": "WAF Monitoring",
   "uid": "O1yNV73nk2",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

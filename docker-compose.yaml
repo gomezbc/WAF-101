@@ -15,7 +15,7 @@
       container_name: nginx-modsec
       environment:
         MODSEC_AUDIT_LOG: /var/log/nginx/modsec_audit.log
-        MODSEC_RULE_ENGINE: On
+        MODSEC_RULE_ENGINE: DetectionOnly
       volumes:
         - ./nginx-log:/var/log/nginx:rw
       ports:

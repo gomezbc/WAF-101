@@ -65,6 +65,8 @@ El objetivo de este laboratorio es proteger Juice Shop, una aplicación web desa
 
 Durante el laboratorio, se simularán ataques automatizados hacia Juice Shop. El objetivo es observar cómo un WAF detecta y bloquea estos ataques, protegiendo la aplicación. Esto permitirá explorar las capacidades de un WAF en un entorno controlado y entender cómo mitiga riesgos en aplicaciones web vulnerables.
 
+El laboratorio está estructurado en dos fases: en la primera, se realizará un ataque de **SQL Injection** sobre la aplicación sin protección. Posteriormente, activaremos el WAF y verificaremos su efectividad al bloquear el ataque.
+
 ### Arquitectura del laboratorio
 El laboratorio utiliza contenedores Docker para configurar un entorno controlado con los siguientes servicios:
 + Juice Shop: Aplicación web intencionalmente vulnerable, utilizada como objetivo para ataques.
@@ -80,6 +82,54 @@ Elastic Stack y Grafana permiten obtener una visión integral del entorno:
 + Tráfico permitido vs. bloqueado.
 
 Usamos Filebeat para recolectar logs de Nginx y ModSecurity y enviarlos a Logstash, donde se procesan y almacenan en Elasticsearch.
+
+## 1. Parte
+En la primera parte el WAF detectara los ataques pero no los bloqueara.
+### Lanzar Juiceshop junto a Nginx
+1. Clona el repositorio y accede a el
+2. Despliega la página web y los servicios de monitorización
+```sh
+docker compose up nginx-modsec juice-shop grafana logstash filebeat redis elasticsearch -d --build
+```
+3. Accede a la página de login de Juiceshop: [http://localhost/#/login](http://localhost/#/login)
+4. Haz un SQLInjection
+![sqli](login_sqli.png)
+Si has realizado correctamente el SQLi, habras conseguido logearte correctamente como el admin.
+5. Ver los logs de Modsecurity: Para facilitar la compresión del laboratorio, hemos desarrollado varios graficos que muestran la actividad de Modsecurity.
+Para acceder a ellos, primero debes acceder a grafana:
+- **Grafana**: Accede a `http://localhost:3000` (usuario: `admin`, contraseña: `grafana`).
+- Haz click en el apartado de **Dashboar** y selecciona el unico disponible.
+- Baja hasta bajo del Dashboar y podrás ver los logs de ModSecurity.
+![sqli detection](sqli_detected.png)
+Encontraras un log que indica que la injección ha sido detectada.
+
+## 2. Parte
+En está segunda parte activaremos el WAF e intentaremos de nuevo el SQLi
+1. En el [docker-compose.yaml](docker-compose.yaml), en el servicio de nginx-modsec, remplaza `MODSEC_RULE_ENGINE: DetectionOnly` por `MODSEC_RULE_ENGINE: On`. El servicio debería tener esta pinta:
+```yaml
+nginx-modsec:
+  build:
+    context: nginx-modsec
+    dockerfile: Dockerfile
+  container_name: nginx-modsec
+  environment:
+    MODSEC_AUDIT_LOG: /var/log/nginx/modsec_audit.log
+    MODSEC_RULE_ENGINE: On # Tienes que hacer el cambio aquí
+  volumes:
+    - ./nginx-log:/var/log/nginx:rw
+  ports:
+    - 80:80
+  networks:
+    backend:
+      ipv4_address: 10.10.10.200
+```
+2. Actualiza el contenedor de Nginx
+```sh
+docker compose up nginx-modsec -d --build
+```
+3. Accede de nuevo a Juiceshop, cierra sesión e intenta hacer el sqli de nuevo. Te debería de dar el siguiente error:
+![sqli blocked](sqli_block.png)
+El WAF ha bloqueado correctamente el SQLi
 
 ## Lanzar el Docker Compose  
 1. Guarda el archivo `docker-compose.yml` proporcionado en tu sistema.  

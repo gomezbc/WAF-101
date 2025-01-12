@@ -43,6 +43,21 @@
       extra_hosts:
         - "www.juiceshop.com:10.10.10.200"
 
+    flag-injection:
+      image: curlimages/curl:latest
+      container_name: flag-injection
+      depends_on:
+        - juice-shop
+      entrypoint: >
+        sh -c "
+          sleep 5 &&
+          curl -o /dev/null -s -w '%{http_code}' -X POST -d 'flag{w4f_detection_enabled}' http://www.juiceshop.com/rest/product/1/reviews;
+        "
+      extra_hosts:
+        - "www.juiceshop.com:10.10.10.200"
+      networks:
+        backend:
+          ipv4_address: 10.10.10.150
 
     xss-attack:
       image: curlimages/curl:latest

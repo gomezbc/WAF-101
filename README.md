@@ -83,29 +83,39 @@ Elastic Stack y Grafana permiten obtener una visión integral del entorno:
 
 Usamos Filebeat para recolectar logs de Nginx y ModSecurity y enviarlos a Logstash, donde se procesan y almacenan en Elasticsearch.
 
-## 1. Parte
-En la primera parte el WAF detectara los ataques pero no los bloqueara.
-### Lanzar Juiceshop junto a Nginx
-1. Clona el repositorio y accede a el
-2. Despliega la página web y los servicios de monitorización
+## Parte 1: Configuración de ModSecurity en modo de detección
+En esta primera parte del laboratorio, configuraremos ModSecurity en modo de detección (DetectionOnly). En este modo, el WAF identificará los ataques pero permitirá que el tráfico pase, lo que nos permitirá observar cómo se detectan las amenazas sin interrumpir las peticiones.
+### Configuración del entorno
+1. Clona el repositorio `git clone https://github.com/gomezbc/WAF-101.git`
+2. Navega al directorio `cd WAF-101`
+3. Despliega la página web y los servicios de monitorización utilizando Docker Compose:
 ```sh
 docker compose up nginx-modsec juice-shop grafana logstash filebeat redis elasticsearch -d --build
 ```
-3. Accede a la página de login de Juiceshop: [http://localhost/#/login](http://localhost/#/login)
-4. Haz un SQLInjection
-![sqli](login_sqli.png)
-Si has realizado correctamente el SQLi, habras conseguido logearte correctamente como el admin.
-5. Ver los logs de Modsecurity: Para facilitar la compresión del laboratorio, hemos desarrollado varios graficos que muestran la actividad de Modsecurity.
-Para acceder a ellos, primero debes acceder a grafana:
-- **Grafana**: Accede a `http://localhost:3000` (usuario: `admin`, contraseña: `grafana`).
-- Haz click en el apartado de **Dashboar** y selecciona el unico disponible.
-- Baja hasta bajo del Dashboar y podrás ver los logs de ModSecurity.
-![sqli detection](sqli_detected.png)
-Encontraras un log que indica que la injección ha sido detectada.
+Esto lanzará los servicios de Juice Shop, Nginx con ModSecurity, Grafana, Logstash, Filebeat, Redis y Elasticsearch.
+### Realizar un ataque de SQL Injection
+1. Accede a la página de login de Juiceshop: [http://localhost/#/login](http://localhost/#/login)
+2. Realiza un ataque de SQL Injection en el campo de usuario. Puedes utilizar:
+   + Dirección de correo `OR 1=1 --`
+   + Contraseña cualquiera ![sqli](login_sqli.png)
+   + 
+Si has realizado correctamente el SQLi, habras conseguido iniciar sesión correctamente como el administrador.
+### Ver los logs de Modsecurity
+Para facilitar la compresión del laboratorio, hemos desarrollado varios graficos que muestran la actividad de Modsecurity.
+Para acceder a ellos, primero debes acceder a Grafana:
+- **Grafana**: Accede a `http://localhost:3000`
+  -  usuario: `admin`
+  -  contraseña: `grafana`.
+#### Visualizar los logs de ModSecurity
+- Haz click en el apartado de **Dashboards** y selecciona **WAF Monitoring**.
+- Desplazate hasta bajo del Dashboard y podrás ver los logs de ModSecurity en un panel llamado *Prevented Attack Logs*. Donde deberias ver un registro similar a este:
+`SQL Injection Attack Detected via libinjection`.
+![alt text](sqli_detected.png)
+Este registro indica que ModSecurity ha detectado un ataque de inyección SQL y ha registrado la información correspondiente pese a que no ha bloqueado la petición.
 
-## 2. Parte
-En está segunda parte activaremos el WAF e intentaremos de nuevo el SQLi
-1. En el [docker-compose.yaml](docker-compose.yaml), en el servicio de nginx-modsec, remplaza `MODSEC_RULE_ENGINE: DetectionOnly` por `MODSEC_RULE_ENGINE: On`. El servicio debería tener esta pinta:
+## Parte 2: Activación del WAF
+En está segunda parte activaremos el WAF utilizando el bloqueo de ModSecurity para prevenir ataques e intentaremos de nuevo el SQLi
+1. Modifica el archivo [docker-compose.yaml](docker-compose.yaml). En el servicio de nginx-modsec, remplaza `MODSEC_RULE_ENGINE: DetectionOnly` por `MODSEC_RULE_ENGINE: On`. El servicio debería tener esta pinta:
 ```yaml
 nginx-modsec:
   build:
@@ -114,7 +124,7 @@ nginx-modsec:
   container_name: nginx-modsec
   environment:
     MODSEC_AUDIT_LOG: /var/log/nginx/modsec_audit.log
-    MODSEC_RULE_ENGINE: On # Tienes que hacer el cambio aquí
+    MODSEC_RULE_ENGINE: On # Cambia DetectionOnly por On
   volumes:
     - ./nginx-log:/var/log/nginx:rw
   ports:
@@ -123,15 +133,19 @@ nginx-modsec:
     backend:
       ipv4_address: 10.10.10.200
 ```
-2. Actualiza el contenedor de Nginx
+2. Reconstruye el servicio de Nginx con ModSecurity:
 ```sh
 docker compose up nginx-modsec -d --build
 ```
-3. Accede de nuevo a Juiceshop, cierra sesión e intenta hacer el sqli de nuevo. Te debería de dar el siguiente error:
+3. Prueba el WAF:
+   +  Accede de nuevo a Juiceshop, cierra sesión
+   +  Intenta hacer el sqli de nuevo. 
+   +  Deberías ver un de error indicando que la petición ha sido bloqueada:
 ![sqli blocked](sqli_block.png)
-El WAF ha bloqueado correctamente el SQLi
+¡Felicidades! Has configurado correctamente el WAF y has bloqueado un ataque de inyección SQL.
 
-## Lanzar el Docker Compose  
+## Guía de uso
+### Despliegue de los servicios
 1. Guarda el archivo `docker-compose.yml` proporcionado en tu sistema.  
 2. Abre una terminal y navega al directorio donde guardaste el archivo.  
 3. Ejecuta el siguiente comando para iniciar los servicios:  
@@ -155,22 +169,28 @@ Se ha incluido un script de Python que simula una oleada de ataques a Juice Shop
 
 ## Acceder a las URLs  
 Una vez que los servicios estén en ejecución:  
-- **Juice Shop protegido**: Accede a `http://localhost`.
-- **Juice Shop desprotegido**: Accede a `http://10.10.10.100:3000`.
-- **Grafana**: Accede a `http://localhost:3000` (usuario: `admin`, contraseña: `grafana`).
+| Servicio | URL | Credenciales |
+|----------|-----|--------------|
+| Juice Shop (Protegido) | http://localhost | N/A |
+| Juice Shop (Sin WAF) | http://10.10.10.100:3000 | N/A |
+| Grafana | http://localhost:3000 | usuario: `admin`<br>contraseña: `grafana` |
 
-## Analizar los logs
-Para visualizar los datos recolectados puede verlos de forma gráfica en Grafana.(`http://localhost:3000`)
+### Analizar los logs
+Para visualizar los datos recolectados puede verlos de forma gráfica en Grafana.Los gráficos de Grafana incluyen entre otros:
++ Estadísticas de ataques detectados.
++ OWASP Top 10: Cantidad de ataques por tipo.
++ Solicitudes permitidas vs. bloqueadas.
++ Número de solicitudes.
++ (`http://localhost:3000`)
 Los paneles creados por defecto son los siguientes:
 ![DashboardImage](dashboard.png)
 
-Para configurar un panel en Grafana:
+**Para configurar un panel en Grafana:**
 1. Selecciona "Create Panel" y usa Elasticsearch como fuente de datos.
 2. Configura una consulta que agrupe por algún campo relevante (por ejemplo, tipo de ataque).
 3. Personaliza los colores y agrega etiquetas para facilitar la lectura.
 
-
-También puedes añadir más paneles y métricas según tus necesidades al dashboard dado:
+**También puedes añadir más paneles y métricas según tus necesidades al dashboard dado:**
 1. Selecciona "Edit" en el dashboard.
 2. Selecciona "Add" y elige el tipo de "Visualzation".
 3. Configura la consulta y el tipo de gráfico que deseas añadir.

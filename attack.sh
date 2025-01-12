@@ -26,10 +26,10 @@ attack_sqli() {
             "$TARGET_URL/rest/user/login" &
         if [ $((i % REQUESTS_PER_SECOND)) -eq 0 ]; then
             sleep 1
+        fi
     done
 }
 
-# Función de ataque XSS
 attack_xss() {
     echo "Iniciando ataque XSS..."
     for ((i=1; i<=TOTAL_REQUESTS; i++)); do

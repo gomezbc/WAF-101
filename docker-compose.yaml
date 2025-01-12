@@ -115,6 +115,7 @@
       volumes:
         - ./monitoring/logstash.conf:/usr/share/logstash/pipeline/logstash.conf
         - ./monitoring/GeoLite2-City.mmdb:/usr/share/elasticsearch/modules/ingest-geoip/GeoLite2-City.mmdb
+        - ./monitoring/MOCK_DATA.csv:/data/MOCK_DATA.csv
       networks:
         - monitoring
       depends_on:

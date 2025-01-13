@@ -186,6 +186,9 @@ nginx-modsec:
 ```sh
 docker compose up -d --build
 ```
+``` bash
+docker compose restart nginx-modsec
+```
 >[!note]
 > Con este comando también habilitaremos los ataques automatizados, lo que nos permitirá evaluar cómo el WAF protege nuestro entorno frente a estas amenazas.
 3. Prueba el WAF:

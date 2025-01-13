@@ -145,7 +145,7 @@ Esto lanzará los servicios de Juice Shop, Nginx con ModSecurity, Grafana, Logst
 Si has realizado correctamente el SQLi, habras conseguido iniciar sesión correctamente como el administrador.
 
 **Ver los logs de Modsecurity**
-
+º
 Para facilitar la compresión del laboratorio, hemos desarrollado varios graficos que muestran la actividad de Modsecurity.
 Para acceder a ellos, primero debes acceder a Grafana:
 - **Grafana**: Accede a `http://localhost:3000`
@@ -157,7 +157,9 @@ Para acceder a ellos, primero debes acceder a Grafana:
 - Haz click en el apartado de **Dashboards** y selecciona **WAF Monitoring**.
 - Desplazate hasta bajo del Dashboard y podrás ver los logs de ModSecurity en un panel llamado *Prevented Attack Logs*. Donde deberias ver un registro similar a este:
 `SQL Injection Attack Detected via libinjection`.
-![Grafana dashboard SQLi detected]
+<p align="center">
+  <img src="images/sqli_detected.png" alt="sqli" width="500">
+</p>
 Este registro indica que ModSecurity ha detectado un ataque de inyección SQL y ha registrado la información correspondiente pese a que no ha bloqueado la petición.
 
 ### Ejercicio 2: Activación del WAF
@@ -199,7 +201,7 @@ docker compose up -d --build
 ### Ejercicio 3: Encuentra el Flag
 En este ejercicio, aprenderás a analizar logs de ModSecurity para encontrar información específica.
 
-**Objetivo: **
+**Objetivo:**
 Te encuentras en medio de un incidente de seguridad. El WAF (Web Application Firewall) ha detectado múltiples intentos de ataque contra el sistema, bloqueando varias solicitudes sospechosas. Entre estos atacantes, hay uno particularmente astuto que ha dejado una pista crucial: un flag oculto.
 
 Este atacante realizó una única solicitud antes de ser bloqueado, y esa solicitud contiene la clave que debes encontrar. El flag está camuflado como parte de un comentario en un producto, escondido entre los datos registrados en los logs. Tu tarea es seguir el rastro y desenmascarar la evidencia.

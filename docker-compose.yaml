@@ -153,9 +153,6 @@
         - ./monitoring/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
       networks:
         - monitoring
-      depends_on:
-        - elasticsearch
-      entrypoint: ["/bin/bash", "-c", "until curl -s http://elasticsearch:9200; do echo 'Esperando a Elasticsearch...'; sleep 5; done; exec /run.sh"]
 
 
   networks:

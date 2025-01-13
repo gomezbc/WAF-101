@@ -123,7 +123,8 @@ En esta primera parte del laboratorio, configuraremos ModSecurity en modo de det
 **Configuración del entorno**
 1. Clona el repositorio `git clone https://github.com/gomezbc/WAF-101.git`
 2. Navega al directorio `cd WAF-101`
-3. Despliega la página web y los servicios de monitorización utilizando Docker Compose:
+3. otrorga permisos a filbeat `chmod go-w monitoring/filebeat.yml`.
+4. Despliega la página web y los servicios de monitorización utilizando Docker Compose:
 ```sh
 docker compose up nginx-modsec juice-shop grafana logstash filebeat redis elasticsearch -d --build
 ```

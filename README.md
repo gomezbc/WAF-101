@@ -212,13 +212,13 @@ Este atacante realizó una única solicitud antes de ser bloqueado, y esa solici
 Afortunadamente, tienes las herramientas necesarias para resolver el caso. En los logs del WAF, puedes observar cada intento de ataque y filtrar información específica. La columna `request_uri` será tu aliada para identificar solicitudes sospechosas que podrían contener la pista que buscas.
 
 **Pasos a seguir:**
-1. Accede a Grafana (http://localhost:3000)
+1. Accede a Grafana [http://localhost:3000]()
 2. Ve al Dashboard "WAF Monitoring"
 3. En el panel de logs, filtra por la IP sospechosa
 4. Busca en los logs el patrón "flag{}"
 
 Tu misión:
-1. Accede a Grafana, el centro de control, en (http://localhost:3000)[http://localhost:3000].
+1. Accede a Grafana, el centro de control, en [http://localhost:3000]().
 2. Dirígete al Dashboard "WAF Monitoring" para visualizar los logs del sistema.
 3. Usa la columna `request_uri` para filtrar solicitudes que te parezcan fuera de lo común. Analiza cuidadosamente las entradas relacionadas con la IP sospechosa.
 4. Busca en los registros el patrón flag{}, la firma que delata la presencia del flag. Ten en cuenta que los caracteres {} pueden estar codificados en la URL como %7B y %7D, por lo que también deberías buscar esas versiones codificadas.

@@ -225,9 +225,6 @@ Tu misión:
 
 El destino del sistema depende de tu capacidad para analizar los logs y descubrir el flag. ¡Buena suerte, investigador cibernético!
 
-**Solución:**
-El flag es: `flag{w4f_detection_enabled}`
-
 ## Referencias
 - [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/)
 - [ModSecurity](https://modsecurity.org/)

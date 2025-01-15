@@ -225,6 +225,8 @@ Tu misión:
 
 El destino del sistema depende de tu capacidad para analizar los logs y descubrir el flag. ¡Buena suerte, investigador cibernético!
 
+>[!note] 
+>En cualquer caso también existe una review ligera del laboratorio en caso de que desees echar un vistazo. [Video review](https://www.youtube.com/watch?v=FJfAHuSidLE&ab_channel=AlexRivasMachin)
 ## Referencias
 - [OWASP Juice Shop](https://owasp.org/www-project-juice-shop/)
 - [ModSecurity](https://modsecurity.org/)
